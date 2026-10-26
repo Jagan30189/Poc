@@ -252,42 +252,31 @@ void searchItem() {
 
 void updateItem() {
 
-    int id, index;
-
+    int id, index, newQuantity;
 
     if(!readInt("Enter Item ID: ", &id))
         return;
 
-
     index = findItem(id);
 
-
     if(index == -1) {
-
         printf("Item Not Found!\n");
-
         return;
-
     }
 
-
-    if(!readInt("Enter New Quantity: ", &inventory[index].quantity))
+    if(!readInt("Enter New Quantity: ", &newQuantity))
         return;
 
-    if(inventory[index].quantity < 0) {
-
+    if(newQuantity < 0) {
         printf("Quantity cannot be negative!\n");
-
         return;
-
     }
-
 
     if(!readText("Enter New Expiry Date: ", inventory[index].expiryDate,
                  sizeof(inventory[index].expiryDate)))
         return;
 
-
+    inventory[index].quantity = newQuantity;
     printf("Item Updated Successfully!\n");
 
 }
@@ -386,19 +375,13 @@ void lowStockItems() {
         if(inventory[i].quantity <= 10 && inventory[i].quantity > 0) {
 
             printf("%d - %s (Qty: %d)\n",
-
                    inventory[i].itemID,
-
                    inventory[i].name,
-
                    inventory[i].quantity);
 
             found = 1;
-
         }
-
     }
-
 
     if(!found)
 
@@ -739,6 +722,7 @@ void viewDistributionHistory() {
 /* Main Function */
 
 
+#ifndef UNIT_TEST
 int main() {
 
 
@@ -838,3 +822,4 @@ int main() {
     return 0;
 
 }
+#endif
