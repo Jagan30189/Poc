@@ -2,6 +2,8 @@
 
 #include <string.h>
 
+#include <time.h>
+
 
 #define MAX_ITEMS 100
 
@@ -22,6 +24,10 @@ typedef struct {
 
     char expiryDate[15];
 
+    char createdDate[20];
+
+    char updatedDate[20];
+
 } MedicalItem;
 
 
@@ -36,6 +42,10 @@ typedef struct {
     char department[50];
 
     char status[20];
+
+    char createdDate[20];
+
+    char processedDate[20];
 
 } SupplyRequest;
 
@@ -52,6 +62,8 @@ typedef struct {
 
     char department[50];
 
+    char distributedDate[20];
+
 } Distribution;
 
 
@@ -67,6 +79,20 @@ int itemCount = 0;
 int requestCount = 0;
 
 int distributionCount = 0;
+
+void currentDate(char date[20]) {
+
+    time_t now = time(NULL);
+    struct tm *local = localtime(&now);
+
+    if(local == NULL) {
+        date[0] = '\0';
+        return;
+    }
+
+    if(strftime(date, 20, "%d-%m-%Y %H:%M:%S", local) == 0)
+        date[0] = '\0';
+}
 
 
 void discardInput() {
@@ -177,8 +203,13 @@ void addItem() {
                  sizeof(inventory[itemCount].expiryDate)))
         return;
 
+    currentDate(inventory[itemCount].createdDate);
+    strcpy(inventory[itemCount].updatedDate,
+           inventory[itemCount].createdDate);
+
     itemCount++;
-    printf("Item Added Successfully!\n");
+    printf("Item Added Successfully at %s!\n",
+           inventory[itemCount - 1].createdDate);
 }
 
 
@@ -209,7 +240,11 @@ void viewInventory() {
 
         printf("\nQuantity: %d", inventory[i].quantity);
 
-        printf("\nExpiry Date: %s\n", inventory[i].expiryDate);
+        printf("\nExpiry Date: %s", inventory[i].expiryDate);
+
+        printf("\nCreated Date: %s", inventory[i].createdDate);
+
+        printf("\nUpdated Date: %s\n", inventory[i].updatedDate);
 
     }
 
@@ -277,6 +312,7 @@ void updateItem() {
         return;
 
     inventory[index].quantity = newQuantity;
+    currentDate(inventory[index].updatedDate);
     printf("Item Updated Successfully!\n");
 
 }
@@ -474,6 +510,8 @@ void createRequest() {
                  sizeof(requests[requestCount].department)))
         return;
 
+    currentDate(requests[requestCount].createdDate);
+    requests[requestCount].processedDate[0] = '\0';
 
     strcpy(requests[requestCount].status, "Pending");
 
@@ -510,6 +548,7 @@ void processRequest() {
             if(index == -1) {
 
                 strcpy(requests[i].status, "Rejected");
+                currentDate(requests[i].processedDate);
 
                 printf("Item Not Found.\n");
 
@@ -521,6 +560,7 @@ void processRequest() {
             if(inventory[index].quantity >= requests[i].quantity) {
 
                 strcpy(requests[i].status, "Approved");
+                currentDate(requests[i].processedDate);
 
                 printf("Request Approved.\n");
 
@@ -529,6 +569,7 @@ void processRequest() {
             else {
 
                 strcpy(requests[i].status, "Rejected");
+                currentDate(requests[i].processedDate);
 
                 printf("Insufficient Stock. Request Rejected.\n");
 
@@ -566,7 +607,11 @@ void viewRequests() {
 
         printf("\nDepartment : %s", requests[i].department);
 
-        printf("\nStatus     : %s\n", requests[i].status);
+        printf("\nStatus     : %s", requests[i].status);
+
+        printf("\nCreated Date : %s", requests[i].createdDate);
+
+        printf("\nProcessed Date: %s\n", requests[i].processedDate);
 
     }
 
@@ -658,6 +703,7 @@ void distributeSupply() {
 
                    requests[i].department);
 
+            currentDate(distributions[distributionCount].distributedDate);
 
             distributionCount++;
 
@@ -713,6 +759,10 @@ void viewDistributionHistory() {
         printf("\nDepartment      : %s\n",
 
                distributions[i].department);
+
+        printf("Distributed Date: %s\n",
+
+               distributions[i].distributedDate);
 
     }
 
