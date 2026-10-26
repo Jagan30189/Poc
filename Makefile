@@ -6,6 +6,7 @@ CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic
 CXXFLAGS ?= -std=c++17 -Wall -Wextra -Wpedantic
 GTEST_CXXFLAGS ?=
 GTEST_LIBS ?= -lgtest -lgtest_main -pthread
+MISRA_CONFIG := misra.json
 
 BUILD_DIR := build
 TEST_BIN := $(BUILD_DIR)/medical_test
@@ -19,7 +20,7 @@ COVERAGE_TEST_BIN := $(COVERAGE_DIR)/medical_test
 BUILD_STAMP := $(BUILD_DIR)/.directory
 COVERAGE_STAMP := $(COVERAGE_DIR)/.directory
 
-.PHONY: all build test coverage clean check-gtest static-analysis memcheck \
+.PHONY: all build test coverage clean check-gtest static-analysis misra-check memcheck \
 	optimized-assembly debug check thread-check main-check
 
 all: build
@@ -63,6 +64,26 @@ static-analysis:
 	@command -v cppcheck >/dev/null || { echo 'cppcheck is required'; exit 1; }
 	cppcheck --enable=all --inconclusive --std=c11 \
 		--suppress=missingIncludeSystem medical.c medical.h
+
+misra-check:
+	@command -v cppcheck >/dev/null || { echo 'cppcheck is required'; exit 1; }
+	@misra_addon="$(MISRA_ADDON)"; \
+	if [ -z "$$misra_addon" ]; then \
+		for candidate in \
+			/usr/lib/*/cppcheck/addons/misra.py \
+			/usr/share/cppcheck/addons/misra.py \
+			/usr/local/share/cppcheck/addons/misra.py; do \
+			if [ -f "$$candidate" ]; then misra_addon="$$candidate"; break; fi; \
+		done; \
+	fi; \
+	if [ -z "$$misra_addon" ]; then \
+		echo 'cppcheck MISRA addon (misra.py) is required'; \
+		echo 'install it with the cppcheck package'; \
+		exit 1; \
+	fi; \
+	echo "Running MISRA C:2012 verification with $$misra_addon"; \
+	cppcheck --addon="$(MISRA_CONFIG)" --enable=all --inconclusive --std=c11 \
+		--suppress=missingIncludeSystem --error-exitcode=1 medical.c medical.h
 
 memcheck: $(TEST_BIN)
 	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all \

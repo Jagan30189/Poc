@@ -2,7 +2,8 @@
 
 ## Prerequisites
 
-Linux or GitHub Codespaces with GCC, G++, Make, cppcheck, and GoogleTest:
+Linux or GitHub Codespaces with GCC, G++, Make, cppcheck (including its MISRA
+addon), and GoogleTest:
 
 ```bash
 sudo apt-get update
@@ -45,6 +46,19 @@ make static-analysis
 This runs cppcheck with all standard checks enabled, including inconclusive
 results, against `medical.c` and `medical.h`. The same check is included in
 `make check`.
+
+## MISRA C Compliance Verification
+
+```bash
+make misra-check
+```
+
+This runs cppcheck's MISRA C:2012 addon against the C implementation and header
+with `--error-exitcode=1`. The project deviation list in
+[`misra.json`](./misra.json) records the currently accepted rules for this
+hosted, interactive example; any new MISRA rule violation fails the command.
+The MISRA addon is distributed with cppcheck; Debian/Ubuntu
+installations normally provide it under `/usr/lib/*/cppcheck/addons/misra.py`.
 
 Records include timestamps in `DD-MM-YYYY HH:MM:SS` format:
 

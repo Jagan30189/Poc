@@ -1,7 +1,7 @@
         -:    0:Source:medical.c
         -:    0:Graph:build/coverage/medical.gcno
         -:    0:Data:build/coverage/medical.gcda
-        -:    0:Runs:7
+        -:    0:Runs:10
         -:    1:#include "medical.h"
         -:    2:
         -:    3:#include <limits.h>
@@ -23,202 +23,202 @@
         -:   19:
         -:   20:int distributionCount = 0;
         -:   21:
-function currentDate called 210 returned 100% blocks executed 75%
-      210:   22:static void currentDate(char date[20]) {
+function currentDate called 300 returned 100% blocks executed 75%
+      300:   22:static void currentDate(char date[20]) {
         -:   23:
-      210:   24:    time_t now = time(NULL);
-call    0 returned 210
-      210:   25:    const struct tm *local = localtime(&now);
-call    0 returned 210
+      300:   24:    time_t now = time(NULL);
+call    0 returned 300
+      300:   25:    const struct tm *local = localtime(&now);
+call    0 returned 300
         -:   26:
-      210:   27:    if(local == NULL) {
+      300:   27:    if(local == NULL) {
 branch  0 taken 0 (fallthrough)
-branch  1 taken 210
+branch  1 taken 300
     #####:   28:        date[0] = '\0';
     #####:   29:        return;
         -:   30:    }
         -:   31:
-      210:   32:    if(strftime(date, 20, "%d-%m-%Y %H:%M:%S", local) == 0)
+      300:   32:    if(strftime(date, 20, "%d-%m-%Y %H:%M:%S", local) == 0)
 branch  0 taken 0 (fallthrough)
-branch  1 taken 210
+branch  1 taken 300
     #####:   33:        date[0] = '\0';
         -:   34:}
         -:   35:
-function logEvent called 105 returned 100% blocks executed 69%
-      105:   36:static void logEvent(const char *event) {
-      105:   37:    FILE *log = fopen("medical.log", "a");
-call    0 returned 105
+function logEvent called 150 returned 100% blocks executed 69%
+      150:   36:static void logEvent(const char *event) {
+      150:   37:    FILE *log = fopen("medical.log", "a");
+call    0 returned 150
         -:   38:    char timestamp[20];
         -:   39:
-      105:   40:    if(log == NULL) {
+      150:   40:    if(log == NULL) {
 branch  0 taken 0 (fallthrough)
-branch  1 taken 105
+branch  1 taken 150
     #####:   41:        fprintf(stderr, "Warning: unable to open medical.log\n");
 call    0 never executed
     #####:   42:        return;
         -:   43:    }
         -:   44:
-      105:   45:    currentDate(timestamp);
-call    0 returned 105
-      105:   46:    if(fprintf(log, "[%s] %s\n", timestamp, event) < 0)
-call    0 returned 105
+      150:   45:    currentDate(timestamp);
+call    0 returned 150
+      150:   46:    if(fprintf(log, "[%s] %s\n", timestamp, event) < 0)
+call    0 returned 150
 branch  1 taken 0 (fallthrough)
-branch  2 taken 105
+branch  2 taken 150
     #####:   47:        fprintf(stderr, "Warning: unable to write medical.log\n");
 call    0 never executed
-      105:   48:    if(fclose(log) != 0)
-call    0 returned 105
+      150:   48:    if(fclose(log) != 0)
+call    0 returned 150
 branch  1 taken 0 (fallthrough)
-branch  2 taken 105
+branch  2 taken 150
     #####:   49:        fprintf(stderr, "Warning: unable to close medical.log\n");
 call    0 never executed
         -:   50:}
         -:   51:
-function validateDate called 45 returned 100% blocks executed 89%
-       45:   52:int validateDate(const char *date) {
+function validateDate called 66 returned 100% blocks executed 89%
+       66:   52:int validateDate(const char *date) {
         -:   53:    int day, month, year;
         -:   54:    char extra;
-       45:   55:    struct tm candidate = {0};
+       66:   55:    struct tm candidate = {0};
         -:   56:
-       45:   57:    if(date == NULL || sscanf(date, "%2d/%2d/%4d%c",
-branch  0 taken 45 (fallthrough)
+       66:   57:    if(date == NULL || sscanf(date, "%2d/%2d/%4d%c",
+branch  0 taken 66 (fallthrough)
 branch  1 taken 0
 branch  2 taken 0 (fallthrough)
-branch  3 taken 45
+branch  3 taken 66
         -:   58:                              &day, &month, &year, &extra) != 3)
     #####:   59:        return 0;
-       45:   60:    if(year < 1900 || month < 1 || month > 12 || day < 1 || day > 31)
-branch  0 taken 45 (fallthrough)
+       66:   60:    if(year < 1900 || month < 1 || month > 12 || day < 1 || day > 31)
+branch  0 taken 66 (fallthrough)
 branch  1 taken 0
-branch  2 taken 45 (fallthrough)
+branch  2 taken 66 (fallthrough)
 branch  3 taken 0
-branch  4 taken 45 (fallthrough)
+branch  4 taken 66 (fallthrough)
 branch  5 taken 0
-branch  6 taken 45 (fallthrough)
+branch  6 taken 66 (fallthrough)
 branch  7 taken 0
 branch  8 taken 0 (fallthrough)
-branch  9 taken 45
+branch  9 taken 66
     #####:   61:        return 0;
         -:   62:
-       45:   63:    candidate.tm_year = year - 1900;
-       45:   64:    candidate.tm_mon = month - 1;
-       45:   65:    candidate.tm_mday = day;
-       45:   66:    candidate.tm_isdst = -1;
-       45:   67:    mktime(&candidate);
-call    0 returned 45
-       90:   68:    return candidate.tm_year == year - 1900 &&
-       73:   69:           candidate.tm_mon == month - 1 &&
-branch  0 taken 45 (fallthrough)
+       66:   63:    candidate.tm_year = year - 1900;
+       66:   64:    candidate.tm_mon = month - 1;
+       66:   65:    candidate.tm_mday = day;
+       66:   66:    candidate.tm_isdst = -1;
+       66:   67:    mktime(&candidate);
+call    0 returned 66
+      132:   68:    return candidate.tm_year == year - 1900 &&
+      106:   69:           candidate.tm_mon == month - 1 &&
+branch  0 taken 66 (fallthrough)
 branch  1 taken 0
-branch  2 taken 28 (fallthrough)
-branch  3 taken 17
-       28:   70:           candidate.tm_mday == day;
-branch  0 taken 28 (fallthrough)
+branch  2 taken 40 (fallthrough)
+branch  3 taken 26
+       40:   70:           candidate.tm_mday == day;
+branch  0 taken 40 (fallthrough)
 branch  1 taken 0
         -:   71:}
         -:   72:
         -:   73:
-function discardInput called 494 returned 100% blocks executed 100%
-      494:   74:void discardInput() {
+function discardInput called 755 returned 100% blocks executed 100%
+      755:   74:void discardInput() {
         -:   75:
         -:   76:    int character;
         -:   77:
-      608:   78:    while((character = getchar()) != '\n' && character != EOF) {
-call    0 returned 608
-branch  1 taken 114 (fallthrough)
-branch  2 taken 494
-branch  3 taken 114 (fallthrough)
+      968:   78:    while((character = getchar()) != '\n' && character != EOF) {
+call    0 returned 968
+branch  1 taken 213 (fallthrough)
+branch  2 taken 755
+branch  3 taken 213 (fallthrough)
 branch  4 taken 0
         -:   79:    }
         -:   80:
-      494:   81:}
+      755:   81:}
         -:   82:
         -:   83:
-function readInt called 494 returned 100% blocks executed 100%
-      494:   84:int readInt(const char *prompt, int *value) {
+function readInt called 755 returned 100% blocks executed 100%
+      755:   84:int readInt(const char *prompt, int *value) {
         -:   85:
-      494:   86:    printf("%s", prompt);
-call    0 returned 494
+      755:   86:    printf("%s", prompt);
+call    0 returned 755
         -:   87:
-      494:   88:    if(scanf("%d", value) != 1) {
-call    0 returned 494
-branch  1 taken 38 (fallthrough)
-branch  2 taken 456
+      755:   88:    if(scanf("%d", value) != 1) {
+call    0 returned 755
+branch  1 taken 71 (fallthrough)
+branch  2 taken 684
         -:   89:
-       38:   90:        discardInput();
-call    0 returned 38
+       71:   90:        discardInput();
+call    0 returned 71
         -:   91:
-       38:   92:        printf("Invalid number.\n");
-call    0 returned 38
+       71:   92:        printf("Invalid number.\n");
+call    0 returned 71
         -:   93:
-       38:   94:        return 0;
+       71:   94:        return 0;
         -:   95:
         -:   96:    }
         -:   97:
-      456:   98:    discardInput();
-call    0 returned 456
+      684:   98:    discardInput();
+call    0 returned 684
         -:   99:
-      456:  100:    return 1;
+      684:  100:    return 1;
         -:  101:
         -:  102:}
         -:  103:
         -:  104:
-function readText called 144 returned 100% blocks executed 85%
-      144:  105:int readText(const char *prompt, char *value, int size) {
+function readText called 216 returned 100% blocks executed 85%
+      216:  105:int readText(const char *prompt, char *value, int size) {
         -:  106:
         -:  107:    size_t length;
         -:  108:
-      144:  109:    printf("%s", prompt);
-call    0 returned 144
+      216:  109:    printf("%s", prompt);
+call    0 returned 216
         -:  110:
-      144:  111:    if(fgets(value, size, stdin) == NULL)
-call    0 returned 144
+      216:  111:    if(fgets(value, size, stdin) == NULL)
+call    0 returned 216
 branch  1 taken 0 (fallthrough)
-branch  2 taken 144
+branch  2 taken 216
     #####:  112:        return 0;
         -:  113:
-      144:  114:    length = strlen(value);
+      216:  114:    length = strlen(value);
         -:  115:
-      144:  116:    if(length > 0 && value[length - 1] == '\n')
-branch  0 taken 144 (fallthrough)
+      216:  116:    if(length > 0 && value[length - 1] == '\n')
+branch  0 taken 216 (fallthrough)
 branch  1 taken 0
-branch  2 taken 144 (fallthrough)
+branch  2 taken 216 (fallthrough)
 branch  3 taken 0
-      144:  117:        value[length - 1] = '\0';
+      216:  117:        value[length - 1] = '\0';
         -:  118:    else
     #####:  119:        discardInput();
 call    0 never executed
         -:  120:
-      144:  121:    if(value[0] == '\0') {
-branch  0 taken 13 (fallthrough)
-branch  1 taken 131
-       13:  122:        printf("Value cannot be empty.\n");
-call    0 returned 13
-       13:  123:        return 0;
+      216:  121:    if(value[0] == '\0') {
+branch  0 taken 25 (fallthrough)
+branch  1 taken 191
+       25:  122:        printf("Value cannot be empty.\n");
+call    0 returned 25
+       25:  123:        return 0;
         -:  124:    }
-      131:  125:    return 1;
+      191:  125:    return 1;
         -:  126:
         -:  127:}
         -:  128:
         -:  129:
-function findItem called 202 returned 100% blocks executed 100%
-      202:  130:int findItem(int id) {
+function findItem called 301 returned 100% blocks executed 100%
+      301:  130:int findItem(int id) {
         -:  131:
         -:  132:    int i;
         -:  133:
-      265:  134:    for(i = 0; i < itemCount; i++) {
-branch  0 taken 179
-branch  1 taken 86 (fallthrough)
+      391:  134:    for(i = 0; i < itemCount; i++) {
+branch  0 taken 266
+branch  1 taken 125 (fallthrough)
         -:  135:
-      179:  136:        if(inventory[i].itemID == id)
-branch  0 taken 116 (fallthrough)
-branch  1 taken 63
+      266:  136:        if(inventory[i].itemID == id)
+branch  0 taken 176 (fallthrough)
+branch  1 taken 90
         -:  137:
-      116:  138:            return i;
+      176:  138:            return i;
         -:  139:
         -:  140:    }
         -:  141:
-       86:  142:    return -1;
+      125:  142:    return -1;
         -:  143:
         -:  144:}
         -:  145:
@@ -226,297 +226,297 @@ branch  1 taken 63
         -:  147:/* Inventory Management */
         -:  148:
         -:  149:
-function addItem called 59 returned 100% blocks executed 94%
-       59:  150:void addItem() {
+function addItem called 89 returned 100% blocks executed 94%
+       89:  150:void addItem() {
         -:  151:
-       59:  152:    if(itemCount >= MAX_ITEMS) {
-branch  0 taken 7 (fallthrough)
-branch  1 taken 52
-        7:  153:        printf("Inventory Full!\n");
-call    0 returned 7
-        7:  154:        return;
+       89:  152:    if(itemCount >= MAX_ITEMS) {
+branch  0 taken 10 (fallthrough)
+branch  1 taken 79
+       10:  153:        printf("Inventory Full!\n");
+call    0 returned 10
+       10:  154:        return;
         -:  155:    }
         -:  156:
-       52:  157:    if(!readInt("Enter Item ID: ", &inventory[itemCount].itemID))
-call    0 returned 52
-branch  1 taken 7 (fallthrough)
-branch  2 taken 45
-        7:  158:        return;
+       79:  157:    if(!readInt("Enter Item ID: ", &inventory[itemCount].itemID))
+call    0 returned 79
+branch  1 taken 10 (fallthrough)
+branch  2 taken 69
+       10:  158:        return;
         -:  159:
-       45:  160:    if(findItem(inventory[itemCount].itemID) != -1) {
-call    0 returned 45
-branch  1 taken 8 (fallthrough)
-branch  2 taken 37
-        8:  161:        printf("Item ID already exists!\n");
-call    0 returned 8
-        8:  162:        return;
+       69:  160:    if(findItem(inventory[itemCount].itemID) != -1) {
+call    0 returned 69
+branch  1 taken 14 (fallthrough)
+branch  2 taken 55
+       14:  161:        printf("Item ID already exists!\n");
+call    0 returned 14
+       14:  162:        return;
         -:  163:    }
         -:  164:
-       37:  165:    if(!readText("Enter Item Name: ", inventory[itemCount].name,
-call    0 returned 37
-branch  1 taken 7 (fallthrough)
-branch  2 taken 30
+       55:  165:    if(!readText("Enter Item Name: ", inventory[itemCount].name,
+call    0 returned 55
+branch  1 taken 10 (fallthrough)
+branch  2 taken 45
         -:  166:                 sizeof(inventory[itemCount].name)))
-        7:  167:        return;
+       10:  167:        return;
         -:  168:
-       30:  169:    if(!readText("Enter Category: ", inventory[itemCount].category,
-call    0 returned 30
-branch  1 taken 2 (fallthrough)
-branch  2 taken 28
+       45:  169:    if(!readText("Enter Category: ", inventory[itemCount].category,
+call    0 returned 45
+branch  1 taken 5 (fallthrough)
+branch  2 taken 40
         -:  170:                 sizeof(inventory[itemCount].category)))
-        2:  171:        return;
+        5:  171:        return;
         -:  172:
-       28:  173:    if(!readInt("Enter Quantity: ", &inventory[itemCount].quantity))
-call    0 returned 28
+       40:  173:    if(!readInt("Enter Quantity: ", &inventory[itemCount].quantity))
+call    0 returned 40
 branch  1 taken 0 (fallthrough)
-branch  2 taken 28
+branch  2 taken 40
     #####:  174:        return;
         -:  175:
-       28:  176:    if(inventory[itemCount].quantity < 0) {
-branch  0 taken 7 (fallthrough)
-branch  1 taken 21
-        7:  177:        printf("Quantity cannot be negative!\n");
-call    0 returned 7
-        7:  178:        return;
+       40:  176:    if(inventory[itemCount].quantity < 0) {
+branch  0 taken 10 (fallthrough)
+branch  1 taken 30
+       10:  177:        printf("Quantity cannot be negative!\n");
+call    0 returned 10
+       10:  178:        return;
         -:  179:    }
         -:  180:
-       21:  181:    if(!readText("Enter Expiry Date (DD/MM/YYYY): ",
+       30:  181:    if(!readText("Enter Expiry Date (DD/MM/YYYY): ",
 branch  0 taken 0 (fallthrough)
-branch  1 taken 21
-       21:  182:                 inventory[itemCount].expiryDate,
-call    0 returned 21
+branch  1 taken 30
+       30:  182:                 inventory[itemCount].expiryDate,
+call    0 returned 30
         -:  183:                 sizeof(inventory[itemCount].expiryDate)))
     #####:  184:        return;
         -:  185:
-       21:  186:    if(!validateDate(inventory[itemCount].expiryDate)) {
-call    0 returned 21
-branch  1 taken 7 (fallthrough)
-branch  2 taken 14
-        7:  187:        printf("Invalid date. Use DD/MM/YYYY.\n");
-call    0 returned 7
-        7:  188:        return;
+       30:  186:    if(!validateDate(inventory[itemCount].expiryDate)) {
+call    0 returned 30
+branch  1 taken 10 (fallthrough)
+branch  2 taken 20
+       10:  187:        printf("Invalid date. Use DD/MM/YYYY.\n");
+call    0 returned 10
+       10:  188:        return;
         -:  189:    }
         -:  190:
-       14:  191:    currentDate(inventory[itemCount].createdDate);
-call    0 returned 14
-       14:  192:    memcpy(inventory[itemCount].updatedDate,
-       14:  193:           inventory[itemCount].createdDate,
+       20:  191:    currentDate(inventory[itemCount].createdDate);
+call    0 returned 20
+       20:  192:    memcpy(inventory[itemCount].updatedDate,
+       20:  193:           inventory[itemCount].createdDate,
         -:  194:           sizeof(inventory[itemCount].updatedDate));
         -:  195:
-       14:  196:    itemCount++;
-       14:  197:    logEvent("Inventory item added");
-call    0 returned 14
-       14:  198:    printf("Item Added Successfully at %s!\n",
-       14:  199:           inventory[itemCount - 1].createdDate);
-call    0 returned 14
+       20:  196:    itemCount++;
+       20:  197:    logEvent("Inventory item added");
+call    0 returned 20
+       20:  198:    printf("Item Added Successfully at %s!\n",
+       20:  199:           inventory[itemCount - 1].createdDate);
+call    0 returned 20
         -:  200:}
         -:  201:
         -:  202:
-function viewInventory called 9 returned 100% blocks executed 100%
-        9:  203:void viewInventory() {
+function viewInventory called 15 returned 100% blocks executed 100%
+       15:  203:void viewInventory() {
         -:  204:
         -:  205:    int i;
         -:  206:
         -:  207:
-        9:  208:    if(itemCount == 0) {
-branch  0 taken 2 (fallthrough)
-branch  1 taken 7
+       15:  208:    if(itemCount == 0) {
+branch  0 taken 5 (fallthrough)
+branch  1 taken 10
         -:  209:
-        2:  210:        printf("No Inventory Records Found!\n");
-call    0 returned 2
+        5:  210:        printf("No Inventory Records Found!\n");
+call    0 returned 5
         -:  211:
-        2:  212:        return;
+        5:  212:        return;
         -:  213:
         -:  214:    }
         -:  215:
         -:  216:
-        7:  217:    printf("\n----- INVENTORY -----\n");
-call    0 returned 7
+       10:  217:    printf("\n----- INVENTORY -----\n");
+call    0 returned 10
         -:  218:
         -:  219:
-      707:  220:    for(i = 0; i < itemCount; i++) {
-branch  0 taken 700
-branch  1 taken 7 (fallthrough)
+     1010:  220:    for(i = 0; i < itemCount; i++) {
+branch  0 taken 1000
+branch  1 taken 10 (fallthrough)
         -:  221:
-      700:  222:        printf("\nID: %d", inventory[i].itemID);
-call    0 returned 700
+     1000:  222:        printf("\nID: %d", inventory[i].itemID);
+call    0 returned 1000
         -:  223:
-      700:  224:        printf("\nName: %s", inventory[i].name);
-call    0 returned 700
+     1000:  224:        printf("\nName: %s", inventory[i].name);
+call    0 returned 1000
         -:  225:
-      700:  226:        printf("\nCategory: %s", inventory[i].category);
-call    0 returned 700
+     1000:  226:        printf("\nCategory: %s", inventory[i].category);
+call    0 returned 1000
         -:  227:
-      700:  228:        printf("\nQuantity: %d", inventory[i].quantity);
-call    0 returned 700
+     1000:  228:        printf("\nQuantity: %d", inventory[i].quantity);
+call    0 returned 1000
         -:  229:
-      700:  230:        printf("\nExpiry Date: %s", inventory[i].expiryDate);
-call    0 returned 700
+     1000:  230:        printf("\nExpiry Date: %s", inventory[i].expiryDate);
+call    0 returned 1000
         -:  231:
-      700:  232:        printf("\nCreated Date: %s", inventory[i].createdDate);
-call    0 returned 700
+     1000:  232:        printf("\nCreated Date: %s", inventory[i].createdDate);
+call    0 returned 1000
         -:  233:
-      700:  234:        printf("\nUpdated Date: %s\n", inventory[i].updatedDate);
-call    0 returned 700
+     1000:  234:        printf("\nUpdated Date: %s\n", inventory[i].updatedDate);
+call    0 returned 1000
         -:  235:
         -:  236:    }
         -:  237:
         -:  238:}
         -:  239:
         -:  240:
-function searchItem called 21 returned 100% blocks executed 100%
-       21:  241:void searchItem() {
+function searchItem called 30 returned 100% blocks executed 100%
+       30:  241:void searchItem() {
         -:  242:
         -:  243:    int id, index;
         -:  244:
         -:  245:
-       21:  246:    if(!readInt("Enter Item ID: ", &id))
-call    0 returned 21
-branch  1 taken 7 (fallthrough)
-branch  2 taken 14
-       14:  247:        return;
+       30:  246:    if(!readInt("Enter Item ID: ", &id))
+call    0 returned 30
+branch  1 taken 10 (fallthrough)
+branch  2 taken 20
+       20:  247:        return;
         -:  248:
         -:  249:
-       14:  250:    index = findItem(id);
-call    0 returned 14
+       20:  250:    index = findItem(id);
+call    0 returned 20
         -:  251:
         -:  252:
-       14:  253:    if(index == -1) {
-branch  0 taken 7 (fallthrough)
-branch  1 taken 7
+       20:  253:    if(index == -1) {
+branch  0 taken 10 (fallthrough)
+branch  1 taken 10
         -:  254:
-        7:  255:        printf("Item Not Found!\n");
-call    0 returned 7
+       10:  255:        printf("Item Not Found!\n");
+call    0 returned 10
         -:  256:
-        7:  257:        return;
+       10:  257:        return;
         -:  258:
         -:  259:    }
         -:  260:
         -:  261:
-        7:  262:    printf("\nID: %d", inventory[index].itemID);
-call    0 returned 7
+       10:  262:    printf("\nID: %d", inventory[index].itemID);
+call    0 returned 10
         -:  263:
-        7:  264:    printf("\nName: %s", inventory[index].name);
-call    0 returned 7
+       10:  264:    printf("\nName: %s", inventory[index].name);
+call    0 returned 10
         -:  265:
-        7:  266:    printf("\nCategory: %s", inventory[index].category);
-call    0 returned 7
+       10:  266:    printf("\nCategory: %s", inventory[index].category);
+call    0 returned 10
         -:  267:
-        7:  268:    printf("\nQuantity: %d", inventory[index].quantity);
-call    0 returned 7
+       10:  268:    printf("\nQuantity: %d", inventory[index].quantity);
+call    0 returned 10
         -:  269:
-        7:  270:    printf("\nExpiry Date: %s\n", inventory[index].expiryDate);
-call    0 returned 7
+       10:  270:    printf("\nExpiry Date: %s\n", inventory[index].expiryDate);
+call    0 returned 10
         -:  271:
         -:  272:}
         -:  273:
         -:  274:
-function updateItem called 30 returned 100% blocks executed 96%
-       30:  275:void updateItem() {
+function updateItem called 48 returned 100% blocks executed 96%
+       48:  275:void updateItem() {
         -:  276:
         -:  277:    int id, index, newQuantity;
         -:  278:
-       30:  279:    if(!readInt("Enter Item ID: ", &id))
-call    0 returned 30
+       48:  279:    if(!readInt("Enter Item ID: ", &id))
+call    0 returned 48
 branch  1 taken 0 (fallthrough)
-branch  2 taken 30
-      23*:  280:        return;
+branch  2 taken 48
+      38*:  280:        return;
         -:  281:
-       30:  282:    index = findItem(id);
-call    0 returned 30
+       48:  282:    index = findItem(id);
+call    0 returned 48
         -:  283:
-       30:  284:    if(index == -1) {
-branch  0 taken 7 (fallthrough)
-branch  1 taken 23
-        7:  285:        printf("Item Not Found!\n");
-call    0 returned 7
-        7:  286:        return;
+       48:  284:    if(index == -1) {
+branch  0 taken 10 (fallthrough)
+branch  1 taken 38
+       10:  285:        printf("Item Not Found!\n");
+call    0 returned 10
+       10:  286:        return;
         -:  287:    }
         -:  288:
-       23:  289:    if(!readInt("Enter New Quantity: ", &newQuantity))
-call    0 returned 23
-branch  1 taken 3 (fallthrough)
-branch  2 taken 20
-        3:  290:        return;
+       38:  289:    if(!readInt("Enter New Quantity: ", &newQuantity))
+call    0 returned 38
+branch  1 taken 6 (fallthrough)
+branch  2 taken 32
+        6:  290:        return;
         -:  291:
-       20:  292:    if(newQuantity < 0) {
-branch  0 taken 7 (fallthrough)
-branch  1 taken 13
-        7:  293:        printf("Quantity cannot be negative!\n");
-call    0 returned 7
-        7:  294:        return;
+       32:  292:    if(newQuantity < 0) {
+branch  0 taken 10 (fallthrough)
+branch  1 taken 22
+       10:  293:        printf("Quantity cannot be negative!\n");
+call    0 returned 10
+       10:  294:        return;
         -:  295:    }
         -:  296:
-       13:  297:    if(!readText("Enter New Expiry Date: ", inventory[index].expiryDate,
-call    0 returned 13
-branch  1 taken 3 (fallthrough)
-branch  2 taken 10
+       22:  297:    if(!readText("Enter New Expiry Date: ", inventory[index].expiryDate,
+call    0 returned 22
+branch  1 taken 6 (fallthrough)
+branch  2 taken 16
         -:  298:                 sizeof(inventory[index].expiryDate)))
-        3:  299:        return;
+        6:  299:        return;
         -:  300:
-       10:  301:    if(!validateDate(inventory[index].expiryDate)) {
-call    0 returned 10
-branch  1 taken 3 (fallthrough)
-branch  2 taken 7
-        3:  302:        printf("Invalid date. Use DD/MM/YYYY.\n");
-call    0 returned 3
-        3:  303:        return;
+       16:  301:    if(!validateDate(inventory[index].expiryDate)) {
+call    0 returned 16
+branch  1 taken 6 (fallthrough)
+branch  2 taken 10
+        6:  302:        printf("Invalid date. Use DD/MM/YYYY.\n");
+call    0 returned 6
+        6:  303:        return;
         -:  304:    }
         -:  305:
-        7:  306:    inventory[index].quantity = newQuantity;
-        7:  307:    currentDate(inventory[index].updatedDate);
-call    0 returned 7
-        7:  308:    logEvent("Inventory item updated");
-call    0 returned 7
-        7:  309:    printf("Item Updated Successfully!\n");
-call    0 returned 7
+       10:  306:    inventory[index].quantity = newQuantity;
+       10:  307:    currentDate(inventory[index].updatedDate);
+call    0 returned 10
+       10:  308:    logEvent("Inventory item updated");
+call    0 returned 10
+       10:  309:    printf("Item Updated Successfully!\n");
+call    0 returned 10
         -:  310:
         -:  311:}
         -:  312:
         -:  313:
-function deleteItem called 17 returned 100% blocks executed 100%
-       17:  314:void deleteItem() {
+function deleteItem called 26 returned 100% blocks executed 100%
+       26:  314:void deleteItem() {
         -:  315:
         -:  316:    int id, index, i;
         -:  317:
         -:  318:
-       17:  319:    if(!readInt("Enter Item ID: ", &id))
-call    0 returned 17
-branch  1 taken 3 (fallthrough)
-branch  2 taken 14
-       10:  320:        return;
+       26:  319:    if(!readInt("Enter Item ID: ", &id))
+call    0 returned 26
+branch  1 taken 6 (fallthrough)
+branch  2 taken 20
+       16:  320:        return;
         -:  321:
         -:  322:
-       14:  323:    index = findItem(id);
-call    0 returned 14
+       20:  323:    index = findItem(id);
+call    0 returned 20
         -:  324:
         -:  325:
-       14:  326:    if(index == -1) {
-branch  0 taken 7 (fallthrough)
-branch  1 taken 7
+       20:  326:    if(index == -1) {
+branch  0 taken 10 (fallthrough)
+branch  1 taken 10
         -:  327:
-        7:  328:        printf("Item Not Found!\n");
-call    0 returned 7
+       10:  328:        printf("Item Not Found!\n");
+call    0 returned 10
         -:  329:
-        7:  330:        return;
+       10:  330:        return;
         -:  331:
         -:  332:    }
         -:  333:
         -:  334:
-       14:  335:    for(i = index; i < itemCount - 1; i++) {
-branch  0 taken 7
-branch  1 taken 7 (fallthrough)
+       20:  335:    for(i = index; i < itemCount - 1; i++) {
+branch  0 taken 10
+branch  1 taken 10 (fallthrough)
         -:  336:
-        7:  337:        inventory[i] = inventory[i + 1];
+       10:  337:        inventory[i] = inventory[i + 1];
         -:  338:
         -:  339:    }
         -:  340:
         -:  341:
-        7:  342:    itemCount--;
+       10:  342:    itemCount--;
         -:  343:
         -:  344:
-        7:  345:    printf("Item Removed Successfully!\n");
-call    0 returned 7
+       10:  345:    printf("Item Removed Successfully!\n");
+call    0 returned 10
         -:  346:
         -:  347:}
         -:  348:
@@ -524,253 +524,253 @@ call    0 returned 7
         -:  350:/* Stock Management */
         -:  351:
         -:  352:
-function receiveStock called 39 returned 100% blocks executed 100%
-       39:  353:void receiveStock() {
+function receiveStock called 60 returned 100% blocks executed 100%
+       60:  353:void receiveStock() {
         -:  354:
         -:  355:    int id, qty, index;
         -:  356:
         -:  357:
-       39:  358:    if(!readInt("Enter Item ID: ", &id))
-call    0 returned 39
-branch  1 taken 3 (fallthrough)
-branch  2 taken 36
-       32:  359:        return;
+       60:  358:    if(!readInt("Enter Item ID: ", &id))
+call    0 returned 60
+branch  1 taken 6 (fallthrough)
+branch  2 taken 54
+       50:  359:        return;
         -:  360:
         -:  361:
-       36:  362:    index = findItem(id);
-call    0 returned 36
+       54:  362:    index = findItem(id);
+call    0 returned 54
         -:  363:
         -:  364:
-       36:  365:    if(index == -1) {
-branch  0 taken 7 (fallthrough)
-branch  1 taken 29
+       54:  365:    if(index == -1) {
+branch  0 taken 10 (fallthrough)
+branch  1 taken 44
         -:  366:
-        7:  367:        printf("Item Not Found!\n");
-call    0 returned 7
+       10:  367:        printf("Item Not Found!\n");
+call    0 returned 10
         -:  368:
-        7:  369:        return;
+       10:  369:        return;
         -:  370:
         -:  371:    }
         -:  372:
         -:  373:
-       29:  374:    if(!readInt("Enter Quantity Received: ", &qty))
-call    0 returned 29
-branch  1 taken 1 (fallthrough)
-branch  2 taken 28
-        1:  375:        return;
+       44:  374:    if(!readInt("Enter Quantity Received: ", &qty))
+call    0 returned 44
+branch  1 taken 4 (fallthrough)
+branch  2 taken 40
+        4:  375:        return;
         -:  376:
-       28:  377:    if(qty <= 0) {
-branch  0 taken 14 (fallthrough)
-branch  1 taken 14
+       40:  377:    if(qty <= 0) {
+branch  0 taken 20 (fallthrough)
+branch  1 taken 20
         -:  378:
-       14:  379:        printf("Quantity must be positive!\n");
-call    0 returned 14
+       20:  379:        printf("Quantity must be positive!\n");
+call    0 returned 20
         -:  380:
-       14:  381:        return;
+       20:  381:        return;
         -:  382:
         -:  383:    }
         -:  384:
         -:  385:
-       14:  386:    if(qty > INT_MAX - inventory[index].quantity) {
-branch  0 taken 7 (fallthrough)
-branch  1 taken 7
-        7:  387:        printf("Quantity exceeds the supported limit.\n");
-call    0 returned 7
-        7:  388:        return;
+       20:  386:    if(qty > INT_MAX - inventory[index].quantity) {
+branch  0 taken 10 (fallthrough)
+branch  1 taken 10
+       10:  387:        printf("Quantity exceeds the supported limit.\n");
+call    0 returned 10
+       10:  388:        return;
         -:  389:    }
         -:  390:
-        7:  391:    inventory[index].quantity += qty;
-        7:  392:    currentDate(inventory[index].updatedDate);
-call    0 returned 7
-        7:  393:    logEvent("Inventory stock received");
-call    0 returned 7
+       10:  391:    inventory[index].quantity += qty;
+       10:  392:    currentDate(inventory[index].updatedDate);
+call    0 returned 10
+       10:  393:    logEvent("Inventory stock received");
+call    0 returned 10
         -:  394:
         -:  395:
-        7:  396:    printf("Stock Updated Successfully!\n");
-call    0 returned 7
+       10:  396:    printf("Stock Updated Successfully!\n");
+call    0 returned 10
         -:  397:
         -:  398:}
         -:  399:
         -:  400:
-function lowStockItems called 9 returned 100% blocks executed 100%
-        9:  401:void lowStockItems() {
+function lowStockItems called 15 returned 100% blocks executed 100%
+       15:  401:void lowStockItems() {
         -:  402:
-        9:  403:    int i, found = 0;
+       15:  403:    int i, found = 0;
         -:  404:
         -:  405:
-        9:  406:    printf("\n----- LOW STOCK ITEMS -----\n");
-call    0 returned 9
+       15:  406:    printf("\n----- LOW STOCK ITEMS -----\n");
+call    0 returned 15
         -:  407:
         -:  408:
-      709:  409:    for(i = 0; i < itemCount; i++) {
-branch  0 taken 700
-branch  1 taken 9 (fallthrough)
+     1015:  409:    for(i = 0; i < itemCount; i++) {
+branch  0 taken 1000
+branch  1 taken 15 (fallthrough)
         -:  410:
-      700:  411:        if(inventory[i].quantity <= 10 && inventory[i].quantity > 0) {
-branch  0 taken 700 (fallthrough)
+     1000:  411:        if(inventory[i].quantity <= 10 && inventory[i].quantity > 0) {
+branch  0 taken 1000 (fallthrough)
 branch  1 taken 0
-branch  2 taken 350 (fallthrough)
-branch  3 taken 350
+branch  2 taken 500 (fallthrough)
+branch  3 taken 500
         -:  412:
-      350:  413:            printf("%d - %s (Qty: %d)\n",
+      500:  413:            printf("%d - %s (Qty: %d)\n",
         -:  414:                   inventory[i].itemID,
-      350:  415:                   inventory[i].name,
-call    0 returned 350
+      500:  415:                   inventory[i].name,
+call    0 returned 500
         -:  416:                   inventory[i].quantity);
         -:  417:
-      350:  418:            found = 1;
+      500:  418:            found = 1;
         -:  419:        }
         -:  420:    }
         -:  421:
-        9:  422:    if(!found)
-branch  0 taken 2 (fallthrough)
-branch  1 taken 7
+       15:  422:    if(!found)
+branch  0 taken 5 (fallthrough)
+branch  1 taken 10
         -:  423:
-        2:  424:        printf("No Low Stock Items.\n");
-call    0 returned 2
+        5:  424:        printf("No Low Stock Items.\n");
+call    0 returned 5
         -:  425:
-        9:  426:}
+       15:  426:}
         -:  427:
         -:  428:
-function outOfStockItems called 9 returned 100% blocks executed 100%
-        9:  429:void outOfStockItems() {
+function outOfStockItems called 15 returned 100% blocks executed 100%
+       15:  429:void outOfStockItems() {
         -:  430:
-        9:  431:    int i, found = 0;
+       15:  431:    int i, found = 0;
         -:  432:
         -:  433:
-        9:  434:    printf("\n----- OUT OF STOCK ITEMS -----\n");
-call    0 returned 9
+       15:  434:    printf("\n----- OUT OF STOCK ITEMS -----\n");
+call    0 returned 15
         -:  435:
         -:  436:
-      709:  437:    for(i = 0; i < itemCount; i++) {
-branch  0 taken 700
-branch  1 taken 9 (fallthrough)
+     1015:  437:    for(i = 0; i < itemCount; i++) {
+branch  0 taken 1000
+branch  1 taken 15 (fallthrough)
         -:  438:
-      700:  439:        if(inventory[i].quantity == 0) {
-branch  0 taken 350 (fallthrough)
-branch  1 taken 350
+     1000:  439:        if(inventory[i].quantity == 0) {
+branch  0 taken 500 (fallthrough)
+branch  1 taken 500
         -:  440:
-      350:  441:            printf("%d - %s\n",
+      500:  441:            printf("%d - %s\n",
         -:  442:
         -:  443:                   inventory[i].itemID,
         -:  444:
-      350:  445:                   inventory[i].name);
-call    0 returned 350
+      500:  445:                   inventory[i].name);
+call    0 returned 500
         -:  446:
-      350:  447:            found = 1;
+      500:  447:            found = 1;
         -:  448:
         -:  449:        }
         -:  450:
         -:  451:    }
         -:  452:
         -:  453:
-        9:  454:    if(!found)
-branch  0 taken 2 (fallthrough)
-branch  1 taken 7
+       15:  454:    if(!found)
+branch  0 taken 5 (fallthrough)
+branch  1 taken 10
         -:  455:
-        2:  456:        printf("No Out Of Stock Items.\n");
-call    0 returned 2
+        5:  456:        printf("No Out Of Stock Items.\n");
+call    0 returned 5
         -:  457:
-        9:  458:}
+       15:  458:}
         -:  459:
         -:  460:
         -:  461:/* Supply Request Management */
         -:  462:
         -:  463:
-function createRequest called 69 returned 100% blocks executed 96%
-       69:  464:void createRequest() {
+function createRequest called 108 returned 100% blocks executed 96%
+      108:  464:void createRequest() {
         -:  465:
         -:  466:    int i;
         -:  467:
-       69:  468:    if(requestCount >= MAX_REQUESTS) {
-branch  0 taken 7 (fallthrough)
-branch  1 taken 62
+      108:  468:    if(requestCount >= MAX_REQUESTS) {
+branch  0 taken 10 (fallthrough)
+branch  1 taken 98
         -:  469:
-        7:  470:        printf("Request Storage Full!\n");
-call    0 returned 7
+       10:  470:        printf("Request Storage Full!\n");
+call    0 returned 10
         -:  471:
-        7:  472:        return;
+       10:  472:        return;
         -:  473:
         -:  474:    }
         -:  475:
         -:  476:
-       62:  477:    if(!readInt("Enter Request ID: ", &requests[requestCount].requestID))
-call    0 returned 62
+       98:  477:    if(!readInt("Enter Request ID: ", &requests[requestCount].requestID))
+call    0 returned 98
 branch  1 taken 0 (fallthrough)
-branch  2 taken 62
+branch  2 taken 98
     #####:  478:        return;
         -:  479:
-       83:  480:    for(i = 0; i < requestCount; i++) {
-branch  0 taken 28
-branch  1 taken 55 (fallthrough)
+      128:  480:    for(i = 0; i < requestCount; i++) {
+branch  0 taken 40
+branch  1 taken 88 (fallthrough)
         -:  481:
-       28:  482:        if(requests[i].requestID == requests[requestCount].requestID) {
-branch  0 taken 7 (fallthrough)
-branch  1 taken 21
+       40:  482:        if(requests[i].requestID == requests[requestCount].requestID) {
+branch  0 taken 10 (fallthrough)
+branch  1 taken 30
         -:  483:
-        7:  484:            printf("Request ID already exists!\n");
-call    0 returned 7
+       10:  484:            printf("Request ID already exists!\n");
+call    0 returned 10
         -:  485:
-        7:  486:            return;
+       10:  486:            return;
         -:  487:
         -:  488:        }
         -:  489:
         -:  490:    }
         -:  491:
         -:  492:
-       55:  493:    if(!readInt("Enter Item ID: ", &requests[requestCount].itemID))
-call    0 returned 55
-branch  1 taken 3 (fallthrough)
-branch  2 taken 52
-        3:  494:        return;
+       88:  493:    if(!readInt("Enter Item ID: ", &requests[requestCount].itemID))
+call    0 returned 88
+branch  1 taken 9 (fallthrough)
+branch  2 taken 79
+        9:  494:        return;
         -:  495:
         -:  496:
-       52:  497:    if(!readInt("Enter Quantity Required: ", &requests[requestCount].quantity))
-call    0 returned 52
-branch  1 taken 2 (fallthrough)
-branch  2 taken 50
-        2:  498:        return;
+       79:  497:    if(!readInt("Enter Quantity Required: ", &requests[requestCount].quantity))
+call    0 returned 79
+branch  1 taken 5 (fallthrough)
+branch  2 taken 74
+        5:  498:        return;
         -:  499:
-       50:  500:    if(requests[requestCount].quantity <= 0) {
-branch  0 taken 7 (fallthrough)
-branch  1 taken 43
+       74:  500:    if(requests[requestCount].quantity <= 0) {
+branch  0 taken 10 (fallthrough)
+branch  1 taken 64
         -:  501:
-        7:  502:        printf("Quantity must be positive!\n");
-call    0 returned 7
+       10:  502:        printf("Quantity must be positive!\n");
+call    0 returned 10
         -:  503:
-        7:  504:        return;
+       10:  504:        return;
         -:  505:
         -:  506:    }
         -:  507:
         -:  508:
-       43:  509:    if(!readText("Enter Department: ", requests[requestCount].department,
-call    0 returned 43
-branch  1 taken 1 (fallthrough)
-branch  2 taken 42
+       64:  509:    if(!readText("Enter Department: ", requests[requestCount].department,
+call    0 returned 64
+branch  1 taken 4 (fallthrough)
+branch  2 taken 60
         -:  510:                 sizeof(requests[requestCount].department)))
-        1:  511:        return;
+        4:  511:        return;
         -:  512:
-       42:  513:    currentDate(requests[requestCount].createdDate);
-call    0 returned 42
-       42:  514:    requests[requestCount].processedDate[0] = '\0';
+       60:  513:    currentDate(requests[requestCount].createdDate);
+call    0 returned 60
+       60:  514:    requests[requestCount].processedDate[0] = '\0';
         -:  515:
-       42:  516:    snprintf(requests[requestCount].status,
+       60:  516:    snprintf(requests[requestCount].status,
         -:  517:             sizeof(requests[requestCount].status), "%s", "Pending");
         -:  518:
         -:  519:
-       42:  520:    requestCount++;
-       42:  521:    logEvent("Supply request created");
-call    0 returned 42
+       60:  520:    requestCount++;
+       60:  521:    logEvent("Supply request created");
+call    0 returned 60
         -:  522:
         -:  523:
-       42:  524:    printf("Request Created Successfully!\n");
-call    0 returned 42
+       60:  524:    printf("Request Created Successfully!\n");
+call    0 returned 60
         -:  525:
         -:  526:}
         -:  527:
         -:  528:
-function processRequest called 42 returned 100% blocks executed 100%
-       42:  529:void processRequest() {
+function processRequest called 60 returned 100% blocks executed 100%
+       60:  529:void processRequest() {
         -:  530:
         -:  531:
         -:  532:    int reqID;
@@ -778,136 +778,136 @@ function processRequest called 42 returned 100% blocks executed 100%
         -:  534:    int i, index;
         -:  535:
         -:  536:
-       42:  537:    if(!readInt("Enter Request ID: ", &reqID))
-call    0 returned 42
-branch  1 taken 7 (fallthrough)
-branch  2 taken 35
-       35:  538:        return;
+       60:  537:    if(!readInt("Enter Request ID: ", &reqID))
+call    0 returned 60
+branch  1 taken 10 (fallthrough)
+branch  2 taken 50
+       50:  538:        return;
         -:  539:
         -:  540:
-       63:  541:    for(i = 0; i < requestCount; i++) {
-branch  0 taken 56
-branch  1 taken 7 (fallthrough)
+       90:  541:    for(i = 0; i < requestCount; i++) {
+branch  0 taken 80
+branch  1 taken 10 (fallthrough)
         -:  542:
         -:  543:
-       56:  544:        if(requests[i].requestID == reqID) {
-branch  0 taken 28 (fallthrough)
-branch  1 taken 28
+       80:  544:        if(requests[i].requestID == reqID) {
+branch  0 taken 40 (fallthrough)
+branch  1 taken 40
         -:  545:
         -:  546:
-       28:  547:            index = findItem(requests[i].itemID);
-call    0 returned 28
+       40:  547:            index = findItem(requests[i].itemID);
+call    0 returned 40
         -:  548:
         -:  549:
-       28:  550:            if(index == -1) {
-branch  0 taken 7 (fallthrough)
-branch  1 taken 21
+       40:  550:            if(index == -1) {
+branch  0 taken 10 (fallthrough)
+branch  1 taken 30
         -:  551:
-        7:  552:                snprintf(requests[i].status, sizeof(requests[i].status),
+       10:  552:                snprintf(requests[i].status, sizeof(requests[i].status),
         -:  553:                         "%s", "Rejected");
-        7:  554:                currentDate(requests[i].processedDate);
-call    0 returned 7
-        7:  555:                logEvent("Supply request rejected: item not found");
-call    0 returned 7
+       10:  554:                currentDate(requests[i].processedDate);
+call    0 returned 10
+       10:  555:                logEvent("Supply request rejected: item not found");
+call    0 returned 10
         -:  556:
-        7:  557:                printf("Item Not Found.\n");
-call    0 returned 7
+       10:  557:                printf("Item Not Found.\n");
+call    0 returned 10
         -:  558:
-        7:  559:                return;
+       10:  559:                return;
         -:  560:
         -:  561:            }
         -:  562:
         -:  563:
-       21:  564:            if(inventory[index].quantity >= requests[i].quantity) {
-branch  0 taken 14 (fallthrough)
-branch  1 taken 7
+       30:  564:            if(inventory[index].quantity >= requests[i].quantity) {
+branch  0 taken 20 (fallthrough)
+branch  1 taken 10
         -:  565:
-       14:  566:                snprintf(requests[i].status, sizeof(requests[i].status),
+       20:  566:                snprintf(requests[i].status, sizeof(requests[i].status),
         -:  567:                         "%s", "Approved");
-       14:  568:                currentDate(requests[i].processedDate);
-call    0 returned 14
-       14:  569:                logEvent("Supply request approved");
-call    0 returned 14
+       20:  568:                currentDate(requests[i].processedDate);
+call    0 returned 20
+       20:  569:                logEvent("Supply request approved");
+call    0 returned 20
         -:  570:
-       14:  571:                printf("Request Approved.\n");
-call    0 returned 14
+       20:  571:                printf("Request Approved.\n");
+call    0 returned 20
         -:  572:
         -:  573:            }
         -:  574:
         -:  575:            else {
         -:  576:
-        7:  577:                snprintf(requests[i].status, sizeof(requests[i].status),
+       10:  577:                snprintf(requests[i].status, sizeof(requests[i].status),
         -:  578:                         "%s", "Rejected");
-        7:  579:                currentDate(requests[i].processedDate);
-call    0 returned 7
-        7:  580:                logEvent("Supply request rejected: insufficient stock");
-call    0 returned 7
+       10:  579:                currentDate(requests[i].processedDate);
+call    0 returned 10
+       10:  580:                logEvent("Supply request rejected: insufficient stock");
+call    0 returned 10
         -:  581:
-        7:  582:                printf("Insufficient Stock. Request Rejected.\n");
-call    0 returned 7
+       10:  582:                printf("Insufficient Stock. Request Rejected.\n");
+call    0 returned 10
         -:  583:
         -:  584:            }
         -:  585:
         -:  586:
-       21:  587:            return;
+       30:  587:            return;
         -:  588:
         -:  589:        }
         -:  590:
         -:  591:    }
         -:  592:
         -:  593:
-        7:  594:    printf("Request Not Found.\n");
-call    0 returned 7
+       10:  594:    printf("Request Not Found.\n");
+call    0 returned 10
         -:  595:
         -:  596:}
         -:  597:
         -:  598:
-function viewRequests called 7 returned 100% blocks executed 100%
-        7:  599:void viewRequests() {
+function viewRequests called 10 returned 100% blocks executed 100%
+       10:  599:void viewRequests() {
         -:  600:
         -:  601:
         -:  602:    int i;
         -:  603:
         -:  604:
-        7:  605:    printf("\n----- REQUESTS -----\n");
-call    0 returned 7
+       10:  605:    printf("\n----- REQUESTS -----\n");
+call    0 returned 10
         -:  606:
         -:  607:
-      707:  608:    for(i = 0; i < requestCount; i++) {
-branch  0 taken 700
-branch  1 taken 7 (fallthrough)
+     1010:  608:    for(i = 0; i < requestCount; i++) {
+branch  0 taken 1000
+branch  1 taken 10 (fallthrough)
         -:  609:
-      700:  610:        printf("\nRequest ID : %d", requests[i].requestID);
-call    0 returned 700
+     1000:  610:        printf("\nRequest ID : %d", requests[i].requestID);
+call    0 returned 1000
         -:  611:
-      700:  612:        printf("\nItem ID    : %d", requests[i].itemID);
-call    0 returned 700
+     1000:  612:        printf("\nItem ID    : %d", requests[i].itemID);
+call    0 returned 1000
         -:  613:
-      700:  614:        printf("\nQuantity   : %d", requests[i].quantity);
-call    0 returned 700
+     1000:  614:        printf("\nQuantity   : %d", requests[i].quantity);
+call    0 returned 1000
         -:  615:
-      700:  616:        printf("\nDepartment : %s", requests[i].department);
-call    0 returned 700
+     1000:  616:        printf("\nDepartment : %s", requests[i].department);
+call    0 returned 1000
         -:  617:
-      700:  618:        printf("\nStatus     : %s", requests[i].status);
-call    0 returned 700
+     1000:  618:        printf("\nStatus     : %s", requests[i].status);
+call    0 returned 1000
         -:  619:
-      700:  620:        printf("\nCreated Date : %s", requests[i].createdDate);
-call    0 returned 700
+     1000:  620:        printf("\nCreated Date : %s", requests[i].createdDate);
+call    0 returned 1000
         -:  621:
-      700:  622:        printf("\nProcessed Date: %s\n", requests[i].processedDate);
-call    0 returned 700
+     1000:  622:        printf("\nProcessed Date: %s\n", requests[i].processedDate);
+call    0 returned 1000
         -:  623:
         -:  624:    }
         -:  625:
-        7:  626:}
+       10:  626:}
         -:  627:
         -:  628:
         -:  629:/* Distribution Management */
         -:  630:
         -:  631:
-function distributeSupply called 51 returned 100% blocks executed 100%
-       51:  632:void distributeSupply() {
+function distributeSupply called 75 returned 100% blocks executed 100%
+       75:  632:void distributeSupply() {
         -:  633:
         -:  634:
         -:  635:    int reqID;
@@ -915,180 +915,180 @@ function distributeSupply called 51 returned 100% blocks executed 100%
         -:  637:    int i, itemIndex;
         -:  638:
         -:  639:
-       51:  640:    if(distributionCount >= MAX_DISTRIBUTIONS) {
-branch  0 taken 7 (fallthrough)
-branch  1 taken 44
+       75:  640:    if(distributionCount >= MAX_DISTRIBUTIONS) {
+branch  0 taken 10 (fallthrough)
+branch  1 taken 65
         -:  641:
-        7:  642:        printf("Distribution Storage Full!\n");
-call    0 returned 7
+       10:  642:        printf("Distribution Storage Full!\n");
+call    0 returned 10
         -:  643:
-       44:  644:        return;
+       65:  644:        return;
         -:  645:
         -:  646:    }
         -:  647:
-       44:  648:    if(!readInt("Enter Approved Request ID: ", &reqID))
-call    0 returned 44
-branch  1 taken 2 (fallthrough)
-branch  2 taken 42
-        2:  649:        return;
+       65:  648:    if(!readInt("Enter Approved Request ID: ", &reqID))
+call    0 returned 65
+branch  1 taken 5 (fallthrough)
+branch  2 taken 60
+        5:  649:        return;
         -:  650:
         -:  651:
-       49:  652:    for(i = 0; i < requestCount; i++) {
-branch  0 taken 42
-branch  1 taken 7 (fallthrough)
+       70:  652:    for(i = 0; i < requestCount; i++) {
+branch  0 taken 60
+branch  1 taken 10 (fallthrough)
         -:  653:
         -:  654:
-       42:  655:        if(requests[i].requestID == reqID) {
-branch  0 taken 35 (fallthrough)
-branch  1 taken 7
+       60:  655:        if(requests[i].requestID == reqID) {
+branch  0 taken 50 (fallthrough)
+branch  1 taken 10
         -:  656:
         -:  657:
-       35:  658:            if(strcmp(requests[i].status, "Approved") != 0) {
-branch  0 taken 14 (fallthrough)
-branch  1 taken 21
+       50:  658:            if(strcmp(requests[i].status, "Approved") != 0) {
+branch  0 taken 20 (fallthrough)
+branch  1 taken 30
         -:  659:
-       14:  660:                printf("Request Is Not Approved.\n");
-call    0 returned 14
+       20:  660:                printf("Request Is Not Approved.\n");
+call    0 returned 20
         -:  661:
-       14:  662:                return;
+       20:  662:                return;
         -:  663:
         -:  664:            }
         -:  665:
         -:  666:
-       21:  667:            itemIndex = findItem(requests[i].itemID);
-call    0 returned 21
+       30:  667:            itemIndex = findItem(requests[i].itemID);
+call    0 returned 30
         -:  668:
         -:  669:
-       21:  670:            if(itemIndex == -1) {
-branch  0 taken 7 (fallthrough)
-branch  1 taken 14
+       30:  670:            if(itemIndex == -1) {
+branch  0 taken 10 (fallthrough)
+branch  1 taken 20
         -:  671:
-        7:  672:                printf("Item Not Found.\n");
-call    0 returned 7
+       10:  672:                printf("Item Not Found.\n");
+call    0 returned 10
         -:  673:
-        7:  674:                return;
+       10:  674:                return;
         -:  675:
         -:  676:            }
         -:  677:
-       14:  678:            if(inventory[itemIndex].quantity < requests[i].quantity) {
-branch  0 taken 7 (fallthrough)
-branch  1 taken 7
+       20:  678:            if(inventory[itemIndex].quantity < requests[i].quantity) {
+branch  0 taken 10 (fallthrough)
+branch  1 taken 10
         -:  679:
-        7:  680:                printf("Insufficient Stock. Supply Not Distributed.\n");
-call    0 returned 7
+       10:  680:                printf("Insufficient Stock. Supply Not Distributed.\n");
+call    0 returned 10
         -:  681:
-        7:  682:                return;
+       10:  682:                return;
         -:  683:
         -:  684:            }
         -:  685:
         -:  686:
-        7:  687:            inventory[itemIndex].quantity -= requests[i].quantity;
+       10:  687:            inventory[itemIndex].quantity -= requests[i].quantity;
         -:  688:
         -:  689:
-        7:  690:            distributions[distributionCount].distributionID =
+       10:  690:            distributions[distributionCount].distributionID =
         -:  691:
-        7:  692:            distributionCount + 1;
+       10:  692:            distributionCount + 1;
         -:  693:
         -:  694:
-        7:  695:            distributions[distributionCount].itemID =
+       10:  695:            distributions[distributionCount].itemID =
         -:  696:
-        7:  697:            requests[i].itemID;
+       10:  697:            requests[i].itemID;
         -:  698:
         -:  699:
-        7:  700:            snprintf(distributions[distributionCount].itemName,
+       10:  700:            snprintf(distributions[distributionCount].itemName,
         -:  701:                     sizeof(distributions[distributionCount].itemName), "%s",
-        7:  702:                     inventory[itemIndex].name);
+       10:  702:                     inventory[itemIndex].name);
         -:  703:
         -:  704:
-        7:  705:            distributions[distributionCount].quantity =
+       10:  705:            distributions[distributionCount].quantity =
         -:  706:
-        7:  707:            requests[i].quantity;
+       10:  707:            requests[i].quantity;
         -:  708:
         -:  709:
-        7:  710:            snprintf(distributions[distributionCount].department,
+       10:  710:            snprintf(distributions[distributionCount].department,
         -:  711:                     sizeof(distributions[distributionCount].department), "%s",
-        7:  712:                     requests[i].department);
+       10:  712:                     requests[i].department);
         -:  713:
-        7:  714:            currentDate(distributions[distributionCount].distributedDate);
-call    0 returned 7
+       10:  714:            currentDate(distributions[distributionCount].distributedDate);
+call    0 returned 10
         -:  715:
-        7:  716:            distributionCount++;
+       10:  716:            distributionCount++;
         -:  717:
-        7:  718:            snprintf(requests[i].status, sizeof(requests[i].status),
+       10:  718:            snprintf(requests[i].status, sizeof(requests[i].status),
         -:  719:                     "%s", "Distributed");
-        7:  720:            logEvent("Supply request distributed");
-call    0 returned 7
+       10:  720:            logEvent("Supply request distributed");
+call    0 returned 10
         -:  721:
         -:  722:
-        7:  723:            printf("Supply Distributed Successfully!\n");
-call    0 returned 7
+       10:  723:            printf("Supply Distributed Successfully!\n");
+call    0 returned 10
         -:  724:
-        7:  725:            return;
+       10:  725:            return;
         -:  726:
         -:  727:        }
         -:  728:
         -:  729:    }
         -:  730:
         -:  731:
-        7:  732:    printf("Request Not Found.\n");
-call    0 returned 7
+       10:  732:    printf("Request Not Found.\n");
+call    0 returned 10
         -:  733:
         -:  734:}
         -:  735:
         -:  736:
-function viewDistributionHistory called 7 returned 100% blocks executed 100%
-        7:  737:void viewDistributionHistory() {
+function viewDistributionHistory called 10 returned 100% blocks executed 100%
+       10:  737:void viewDistributionHistory() {
         -:  738:
         -:  739:
         -:  740:    int i;
         -:  741:
         -:  742:
-        7:  743:    printf("\n----- DISTRIBUTION HISTORY -----\n");
-call    0 returned 7
+       10:  743:    printf("\n----- DISTRIBUTION HISTORY -----\n");
+call    0 returned 10
         -:  744:
         -:  745:
-       14:  746:    for(i = 0; i < distributionCount; i++) {
-branch  0 taken 7
-branch  1 taken 7 (fallthrough)
+       20:  746:    for(i = 0; i < distributionCount; i++) {
+branch  0 taken 10
+branch  1 taken 10 (fallthrough)
         -:  747:
         -:  748:
-        7:  749:        printf("\nDistribution ID : %d",
-call    0 returned 7
+       10:  749:        printf("\nDistribution ID : %d",
+call    0 returned 10
         -:  750:
         -:  751:               distributions[i].distributionID);
         -:  752:
         -:  753:
-        7:  754:        printf("\nItem ID         : %d",
-call    0 returned 7
+       10:  754:        printf("\nItem ID         : %d",
+call    0 returned 10
         -:  755:
         -:  756:               distributions[i].itemID);
         -:  757:
         -:  758:
-        7:  759:        printf("\nItem Name       : %s",
+       10:  759:        printf("\nItem Name       : %s",
         -:  760:
-        7:  761:               distributions[i].itemName);
-call    0 returned 7
+       10:  761:               distributions[i].itemName);
+call    0 returned 10
         -:  762:
         -:  763:
-        7:  764:        printf("\nQuantity        : %d",
-call    0 returned 7
+       10:  764:        printf("\nQuantity        : %d",
+call    0 returned 10
         -:  765:
         -:  766:               distributions[i].quantity);
         -:  767:
         -:  768:
-        7:  769:        printf("\nDepartment      : %s\n",
+       10:  769:        printf("\nDepartment      : %s\n",
         -:  770:
-        7:  771:               distributions[i].department);
-call    0 returned 7
+       10:  771:               distributions[i].department);
+call    0 returned 10
         -:  772:
-        7:  773:        printf("Distributed Date: %s\n",
+       10:  773:        printf("Distributed Date: %s\n",
         -:  774:
-        7:  775:               distributions[i].distributedDate);
-call    0 returned 7
+       10:  775:               distributions[i].distributedDate);
+call    0 returned 10
         -:  776:
         -:  777:    }
         -:  778:
-        7:  779:}
+       10:  779:}
         -:  780:
         -:  781:
         -:  782:/* Main Function */
