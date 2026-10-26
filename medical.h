@@ -11,6 +11,8 @@ typedef struct {
     char category[30];
     int quantity;
     char expiryDate[15];
+    char createdDate[20];
+    char updatedDate[20];
 } MedicalItem;
 
 typedef struct {
@@ -19,6 +21,8 @@ typedef struct {
     int quantity;
     char department[50];
     char status[20];
+    char createdDate[20];
+    char processedDate[20];
 } SupplyRequest;
 
 typedef struct {
@@ -27,6 +31,7 @@ typedef struct {
     char itemName[50];
     int quantity;
     char department[50];
+    char distributedDate[20];
 } Distribution;
 
 extern MedicalItem inventory[MAX_ITEMS];
@@ -37,6 +42,7 @@ extern int requestCount;
 extern int distributionCount;
 
 int findItem(int id);
+int validateDate(const char *date);
 void addItem(void);
 void viewInventory(void);
 void searchItem(void);

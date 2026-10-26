@@ -2,11 +2,11 @@
 
 ## Prerequisites
 
-Linux or GitHub Codespaces with GCC, G++, Make, and GoogleTest:
+Linux or GitHub Codespaces with GCC, G++, Make, cppcheck, and GoogleTest:
 
 ```bash
 sudo apt-get update
-sudo apt-get install -y build-essential libgtest-dev
+sudo apt-get install -y build-essential cppcheck libgtest-dev
 ```
 
 The project uses the system GoogleTest installation by default. Custom include
@@ -25,8 +25,32 @@ make build
 make test
 ```
 
-The suite contains 9 GoogleTest cases covering inventory, stock, requests,
+The suite contains 11 GoogleTest cases covering inventory, stock, requests,
 distribution, validation, capacity limits, and repeated fulfillment.
+
+The project contains 21 functions: 20 application functions covered by the
+GoogleTest suite and `main`, which is covered by the `main-check` command-line
+smoke test. Run all function checks with:
+
+```bash
+make check
+```
+
+## Run Static Analysis
+
+```bash
+make static-analysis
+```
+
+This runs cppcheck with all standard checks enabled, including inconclusive
+results, against `medical.c` and `medical.h`. The same check is included in
+`make check`.
+
+Records include timestamps in `DD-MM-YYYY HH:MM:SS` format:
+
+- Inventory records store created and last-updated dates.
+- Supply requests store created and processed dates.
+- Distribution history stores the distributed date.
 
 ## Run Coverage
 
@@ -40,6 +64,20 @@ This runs the tests with gcov instrumentation and writes:
 - `build/coverage/gcov-summary.txt`
 
 The current suite achieves more than 90% line coverage.
+
+## Quality and Evaluation Targets
+
+```bash
+make check                 # GoogleTest plus cppcheck
+make memcheck              # Valgrind leak and invalid-access checks
+make optimized-assembly   # Compare O1, O2, and O3 assembly sizes
+make debug                 # Build a GDB-ready debug executable
+make thread-check          # Helgrind check (when concurrent tests are added)
+```
+
+The program validates dates, rejects empty fields, checks integer overflow when
+receiving stock, and writes timestamped successful operations to `medical.log`.
+The log is closed after every write so it can be checked for resource leaks.
 
 ## Clean
 

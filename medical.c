@@ -1,70 +1,9 @@
+#include "medical.h"
+
+#include <limits.h>
 #include <stdio.h>
-
 #include <string.h>
-
 #include <time.h>
-
-
-#define MAX_ITEMS 100
-
-#define MAX_REQUESTS 100
-
-#define MAX_DISTRIBUTIONS 100
-
-
-typedef struct {
-
-    int itemID;
-
-    char name[50];
-
-    char category[30];
-
-    int quantity;
-
-    char expiryDate[15];
-
-    char createdDate[20];
-
-    char updatedDate[20];
-
-} MedicalItem;
-
-
-typedef struct {
-
-    int requestID;
-
-    int itemID;
-
-    int quantity;
-
-    char department[50];
-
-    char status[20];
-
-    char createdDate[20];
-
-    char processedDate[20];
-
-} SupplyRequest;
-
-
-typedef struct {
-
-    int distributionID;
-
-    int itemID;
-
-    char itemName[50];
-
-    int quantity;
-
-    char department[50];
-
-    char distributedDate[20];
-
-} Distribution;
 
 
 MedicalItem inventory[MAX_ITEMS];
@@ -80,10 +19,10 @@ int requestCount = 0;
 
 int distributionCount = 0;
 
-void currentDate(char date[20]) {
+static void currentDate(char date[20]) {
 
     time_t now = time(NULL);
-    struct tm *local = localtime(&now);
+    const struct tm *local = localtime(&now);
 
     if(local == NULL) {
         date[0] = '\0';
@@ -92,6 +31,43 @@ void currentDate(char date[20]) {
 
     if(strftime(date, 20, "%d-%m-%Y %H:%M:%S", local) == 0)
         date[0] = '\0';
+}
+
+static void logEvent(const char *event) {
+    FILE *log = fopen("medical.log", "a");
+    char timestamp[20];
+
+    if(log == NULL) {
+        fprintf(stderr, "Warning: unable to open medical.log\n");
+        return;
+    }
+
+    currentDate(timestamp);
+    if(fprintf(log, "[%s] %s\n", timestamp, event) < 0)
+        fprintf(stderr, "Warning: unable to write medical.log\n");
+    if(fclose(log) != 0)
+        fprintf(stderr, "Warning: unable to close medical.log\n");
+}
+
+int validateDate(const char *date) {
+    int day, month, year;
+    char extra;
+    struct tm candidate = {0};
+
+    if(date == NULL || sscanf(date, "%2d/%2d/%4d%c",
+                              &day, &month, &year, &extra) != 3)
+        return 0;
+    if(year < 1900 || month < 1 || month > 12 || day < 1 || day > 31)
+        return 0;
+
+    candidate.tm_year = year - 1900;
+    candidate.tm_mon = month - 1;
+    candidate.tm_mday = day;
+    candidate.tm_isdst = -1;
+    mktime(&candidate);
+    return candidate.tm_year == year - 1900 &&
+           candidate.tm_mon == month - 1 &&
+           candidate.tm_mday == day;
 }
 
 
@@ -142,6 +118,10 @@ int readText(const char *prompt, char *value, int size) {
     else
         discardInput();
 
+    if(value[0] == '\0') {
+        printf("Value cannot be empty.\n");
+        return 0;
+    }
     return 1;
 
 }
@@ -203,11 +183,18 @@ void addItem() {
                  sizeof(inventory[itemCount].expiryDate)))
         return;
 
+    if(!validateDate(inventory[itemCount].expiryDate)) {
+        printf("Invalid date. Use DD/MM/YYYY.\n");
+        return;
+    }
+
     currentDate(inventory[itemCount].createdDate);
-    strcpy(inventory[itemCount].updatedDate,
-           inventory[itemCount].createdDate);
+    memcpy(inventory[itemCount].updatedDate,
+           inventory[itemCount].createdDate,
+           sizeof(inventory[itemCount].updatedDate));
 
     itemCount++;
+    logEvent("Inventory item added");
     printf("Item Added Successfully at %s!\n",
            inventory[itemCount - 1].createdDate);
 }
@@ -311,8 +298,14 @@ void updateItem() {
                  sizeof(inventory[index].expiryDate)))
         return;
 
+    if(!validateDate(inventory[index].expiryDate)) {
+        printf("Invalid date. Use DD/MM/YYYY.\n");
+        return;
+    }
+
     inventory[index].quantity = newQuantity;
     currentDate(inventory[index].updatedDate);
+    logEvent("Inventory item updated");
     printf("Item Updated Successfully!\n");
 
 }
@@ -390,7 +383,14 @@ void receiveStock() {
     }
 
 
+    if(qty > INT_MAX - inventory[index].quantity) {
+        printf("Quantity exceeds the supported limit.\n");
+        return;
+    }
+
     inventory[index].quantity += qty;
+    currentDate(inventory[index].updatedDate);
+    logEvent("Inventory stock received");
 
 
     printf("Stock Updated Successfully!\n");
@@ -513,10 +513,12 @@ void createRequest() {
     currentDate(requests[requestCount].createdDate);
     requests[requestCount].processedDate[0] = '\0';
 
-    strcpy(requests[requestCount].status, "Pending");
+    snprintf(requests[requestCount].status,
+             sizeof(requests[requestCount].status), "%s", "Pending");
 
 
     requestCount++;
+    logEvent("Supply request created");
 
 
     printf("Request Created Successfully!\n");
@@ -547,8 +549,10 @@ void processRequest() {
 
             if(index == -1) {
 
-                strcpy(requests[i].status, "Rejected");
+                snprintf(requests[i].status, sizeof(requests[i].status),
+                         "%s", "Rejected");
                 currentDate(requests[i].processedDate);
+                logEvent("Supply request rejected: item not found");
 
                 printf("Item Not Found.\n");
 
@@ -559,8 +563,10 @@ void processRequest() {
 
             if(inventory[index].quantity >= requests[i].quantity) {
 
-                strcpy(requests[i].status, "Approved");
+                snprintf(requests[i].status, sizeof(requests[i].status),
+                         "%s", "Approved");
                 currentDate(requests[i].processedDate);
+                logEvent("Supply request approved");
 
                 printf("Request Approved.\n");
 
@@ -568,8 +574,10 @@ void processRequest() {
 
             else {
 
-                strcpy(requests[i].status, "Rejected");
+                snprintf(requests[i].status, sizeof(requests[i].status),
+                         "%s", "Rejected");
                 currentDate(requests[i].processedDate);
+                logEvent("Supply request rejected: insufficient stock");
 
                 printf("Insufficient Stock. Request Rejected.\n");
 
@@ -689,9 +697,9 @@ void distributeSupply() {
             requests[i].itemID;
 
 
-            strcpy(distributions[distributionCount].itemName,
-
-                   inventory[itemIndex].name);
+            snprintf(distributions[distributionCount].itemName,
+                     sizeof(distributions[distributionCount].itemName), "%s",
+                     inventory[itemIndex].name);
 
 
             distributions[distributionCount].quantity =
@@ -699,15 +707,17 @@ void distributeSupply() {
             requests[i].quantity;
 
 
-            strcpy(distributions[distributionCount].department,
-
-                   requests[i].department);
+            snprintf(distributions[distributionCount].department,
+                     sizeof(distributions[distributionCount].department), "%s",
+                     requests[i].department);
 
             currentDate(distributions[distributionCount].distributedDate);
 
             distributionCount++;
 
-            strcpy(requests[i].status, "Distributed");
+            snprintf(requests[i].status, sizeof(requests[i].status),
+                     "%s", "Distributed");
+            logEvent("Supply request distributed");
 
 
             printf("Supply Distributed Successfully!\n");

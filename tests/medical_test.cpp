@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <climits>
 #include <cstdio>
 #include <cstring>
 #include <functional>
@@ -61,6 +62,8 @@ TEST_F(MedicalTest, AddsAndFindsItem) {
     EXPECT_EQ(findItem(999), -1);
     EXPECT_STREQ(inventory[0].name, "Gloves");
     EXPECT_EQ(inventory[0].quantity, 5);
+    EXPECT_EQ(std::strlen(inventory[0].createdDate), 19);
+    EXPECT_STREQ(inventory[0].createdDate, inventory[0].updatedDate);
 }
 
 TEST_F(MedicalTest, RejectsInvalidAndDuplicateItems) {
@@ -73,6 +76,16 @@ TEST_F(MedicalTest, RejectsInvalidAndDuplicateItems) {
 
     Input("bad\n", [] { addItem(); });
     EXPECT_EQ(itemCount, 1);
+}
+
+TEST_F(MedicalTest, RejectsEmptyAndInvalidDates) {
+    Input("101\n\n", [] { addItem(); });
+    EXPECT_EQ(itemCount, 0);
+
+    Input("101\nGloves\nPPE\n5\n31/02/2027\n", [] { addItem(); });
+    EXPECT_EQ(itemCount, 0);
+    EXPECT_EQ(validateDate("29/02/2028"), 1);
+    EXPECT_EQ(validateDate("29/02/2027"), 0);
 }
 
 TEST_F(MedicalTest, HandlesInventoryCapacityAndViews) {
@@ -98,6 +111,7 @@ TEST_F(MedicalTest, SearchesUpdatesAndDeletesItems) {
     Input("101\n8\n30/06/2028\n", [] { updateItem(); });
     EXPECT_EQ(inventory[0].quantity, 8);
     EXPECT_STREQ(inventory[0].expiryDate, "30/06/2028");
+    EXPECT_EQ(std::strlen(inventory[0].updatedDate), 19);
 
     Input("101\n-2\n", [] { updateItem(); });
     EXPECT_EQ(inventory[0].quantity, 8);
@@ -107,6 +121,47 @@ TEST_F(MedicalTest, SearchesUpdatesAndDeletesItems) {
     EXPECT_EQ(itemCount, 1);
     EXPECT_EQ(inventory[0].itemID, 102);
     Input("999\n", [] { deleteItem(); });
+}
+
+TEST_F(MedicalTest, RejectsInvalidUpdateAndStockInput) {
+    AddItemDirect(101, "Gloves", 5);
+
+    Input("101\nbad\n", [] { updateItem(); });
+    Input("101\n8\n\n", [] { updateItem(); });
+    Input("101\n8\n31/02/2027\n", [] { updateItem(); });
+    EXPECT_EQ(inventory[0].quantity, 5);
+
+    Input("bad\n", [] { deleteItem(); });
+    Input("bad\n", [] { receiveStock(); });
+    EXPECT_EQ(inventory[0].quantity, 5);
+}
+
+TEST_F(MedicalTest, CoversEmptyViewsAndRejectedInputs) {
+    viewInventory();
+    lowStockItems();
+    outOfStockItems();
+
+    Input("101\nGloves\n\n", [] { addItem(); });
+    EXPECT_EQ(itemCount, 0);
+
+    Input("101\nbad\n", [] { createRequest(); });
+    Input("101\n101\nbad\n", [] { createRequest(); });
+    EXPECT_EQ(requestCount, 0);
+
+    Input("bad\n", [] { distributeSupply(); });
+    EXPECT_EQ(distributionCount, 0);
+}
+
+TEST_F(MedicalTest, CoversAdditionalInputFailures) {
+    AddItemDirect(101, "Gloves", 5);
+
+    Input("101\nbad\n", [] { receiveStock(); });
+    Input("101\nbad\n", [] { createRequest(); });
+    Input("101\n101\n1\n\n", [] { createRequest(); });
+    EXPECT_EQ(requestCount, 0);
+
+    Input("101\nGloves\nPPE\nbad\n", [] { addItem(); });
+    EXPECT_EQ(itemCount, 1);
 }
 
 TEST_F(MedicalTest, ReceivesStockAndRejectsInvalidQuantities) {
@@ -120,15 +175,25 @@ TEST_F(MedicalTest, ReceivesStockAndRejectsInvalidQuantities) {
     EXPECT_EQ(inventory[0].quantity, 9);
 }
 
+TEST_F(MedicalTest, RejectsStockIntegerOverflow) {
+    AddItemDirect(101, "Gloves", INT_MAX);
+
+    Input("101\n1\n", [] { receiveStock(); });
+    EXPECT_EQ(inventory[0].quantity, INT_MAX);
+}
+
 TEST_F(MedicalTest, CreatesAndProcessesRequests) {
     AddItemDirect(101, "Gloves", 5);
 
     Input("501\n101\n3\nEmergency\n", [] { createRequest(); });
     ASSERT_EQ(requestCount, 1);
     EXPECT_STREQ(requests[0].status, "Pending");
+    EXPECT_EQ(std::strlen(requests[0].createdDate), 19);
+    EXPECT_STREQ(requests[0].processedDate, "");
 
     Input("501\n", [] { processRequest(); });
     EXPECT_STREQ(requests[0].status, "Approved");
+    EXPECT_EQ(std::strlen(requests[0].processedDate), 19);
 
     Input("999\n", [] { processRequest(); });
     Input("bad\n", [] { processRequest(); });
@@ -166,6 +231,7 @@ TEST_F(MedicalTest, DistributesApprovedRequestOnlyOnce) {
     ASSERT_EQ(distributionCount, 1);
     EXPECT_EQ(inventory[0].quantity, 2);
     EXPECT_STREQ(requests[0].status, "Distributed");
+    EXPECT_EQ(std::strlen(distributions[0].distributedDate), 19);
 
     Input("501\n", [] { distributeSupply(); });
     EXPECT_EQ(distributionCount, 1);

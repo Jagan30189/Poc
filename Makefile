@@ -19,7 +19,8 @@ COVERAGE_TEST_BIN := $(COVERAGE_DIR)/medical_test
 BUILD_STAMP := $(BUILD_DIR)/.directory
 COVERAGE_STAMP := $(COVERAGE_DIR)/.directory
 
-.PHONY: all build test coverage clean check-gtest
+.PHONY: all build test coverage clean check-gtest static-analysis memcheck \
+	optimized-assembly debug check thread-check main-check
 
 all: build
 
@@ -55,6 +56,35 @@ $(TEST_BIN): check-gtest $(MEDICAL_OBJECT) $(TEST_OBJECT)
 test: $(TEST_BIN)
 	$(TEST_BIN)
 
+main-check: $(MEDICAL_BIN)
+	@printf '14\n' | $(MEDICAL_BIN) | grep -q 'Exiting System'
+
+static-analysis:
+	@command -v cppcheck >/dev/null || { echo 'cppcheck is required'; exit 1; }
+	cppcheck --enable=all --inconclusive --std=c11 \
+		--suppress=missingIncludeSystem medical.c medical.h
+
+memcheck: $(TEST_BIN)
+	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all \
+		--errors-for-leak-kinds=all --error-exitcode=1 $(TEST_BIN)
+
+optimized-assembly:
+	mkdir -p $(BUILD_DIR)/assembly
+	$(CC) $(CPPFLAGS) $(CFLAGS) -O1 -S medical.c -o $(BUILD_DIR)/assembly/medical-O1.s
+	$(CC) $(CPPFLAGS) $(CFLAGS) -O2 -S medical.c -o $(BUILD_DIR)/assembly/medical-O2.s
+	$(CC) $(CPPFLAGS) $(CFLAGS) -O3 -S medical.c -o $(BUILD_DIR)/assembly/medical-O3.s
+	@wc -c $(BUILD_DIR)/assembly/medical-O1.s \
+		$(BUILD_DIR)/assembly/medical-O2.s $(BUILD_DIR)/assembly/medical-O3.s
+
+debug:
+	$(CC) $(CPPFLAGS) $(CFLAGS) -O0 -g3 -DDEBUG medical.c -o $(BUILD_DIR)/medical-debug
+
+thread-check: $(TEST_BIN)
+	@command -v valgrind >/dev/null || { echo 'valgrind is required'; exit 1; }
+	valgrind --tool=helgrind --error-exitcode=1 $(TEST_BIN)
+
+check: test main-check static-analysis
+
 $(COVERAGE_OBJECT): medical.c medical.h | $(COVERAGE_STAMP)
 	$(CC) $(CPPFLAGS) $(CFLAGS) -DUNIT_TEST -fprofile-arcs -ftest-coverage -O0 -g -c $< -o $@
 
@@ -72,4 +102,4 @@ coverage: $(COVERAGE_TEST_BIN)
 	@grep -E 'Lines executed' $(COVERAGE_DIR)/gcov-summary.txt
 
 clean:
-	rm -rf $(BUILD_DIR)
+	rm -rf $(BUILD_DIR) medical.log
