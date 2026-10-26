@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug medical.c",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/medical",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "preLaunchTask": "Build medical.c"
+        }
+    ]
+}
