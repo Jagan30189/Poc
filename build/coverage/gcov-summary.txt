@@ -1,0 +1,8 @@
+File 'medical.c'
+Lines executed:95.29% of 297
+Branches executed:100.00% of 160
+Taken at least once:85.62% of 160
+Calls executed:96.88% of 128
+Creating 'medical.c.gcov'
+
+Lines executed:95.29% of 297
